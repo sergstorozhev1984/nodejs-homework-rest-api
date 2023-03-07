@@ -1,5 +1,8 @@
 const {Schema, model} = require("mongoose")
 const Joi = require("joi");
+const mongoosePaginate = require("mongoose-paginate-v2");
+
+const handleSaveErrors = require("../helpers/handleSaveErrors");
 
 const contactSchema = new Schema ({
   name: {
@@ -16,7 +19,17 @@ const contactSchema = new Schema ({
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  }
+
 }, {versionKey: false, timeseries: true});
+
+contactSchema.post("save", handleSaveErrors);
+
+contactSchema.plugin(mongoosePaginate);
 
 const addSchema = Joi.object({
   name: Joi.string().required(),
